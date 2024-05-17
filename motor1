@@ -1,0 +1,118 @@
+// モータ制御
+const int PWMA = 12;
+const int AIN1 = 13;
+const int AIN2 = 14;
+const int STBY = 25;
+const int PWMB = 2;
+const int BIN1 = 4;
+const int BIN2 = 5;
+const int LEDC_CHANNEL_A = 0;
+const int LEDC_CHANNEL_B = 1;
+const int LEDC_BASE_FREQ = 1000;
+
+void setup() {
+  Serial.begin(115200); // デバッグ用シリアル通信の開始
+
+  Serial.println("Starting setup...");
+
+  // PWMの初期化
+  Serial.println("Initializing PWM for motor A...");
+  ledcSetup(LEDC_CHANNEL_A, LEDC_BASE_FREQ, 8);
+  ledcAttachPin(PWMA, LEDC_CHANNEL_A);
+
+  Serial.println("Initializing PWM for motor B...");
+  ledcSetup(LEDC_CHANNEL_B, LEDC_BASE_FREQ, 8);
+  ledcAttachPin(PWMB, LEDC_CHANNEL_B);
+
+  // GPIOピンの初期化
+  Serial.println("Initializing GPIO pins...");
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+  pinMode(STBY, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+
+  Serial.println("Setting STBY to HIGH...");
+  digitalWrite(STBY, HIGH); // スタンバイ解除
+
+  Serial.println("Setup complete");
+}
+
+void loop() {
+  // モーターA 前進
+  Serial.println("Motor A Forward");
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, LOW);
+
+  // モーターB 前進
+  Serial.println("Motor B Forward");
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, LOW);
+
+  // 加速
+  for(int i = 0; i <= 255; i++){
+    ledcWrite(LEDC_CHANNEL_A, i);
+    ledcWrite(LEDC_CHANNEL_B, i);
+    delay(10);
+    Serial.print("Speed A: ");
+    Serial.print(i);
+    Serial.print(" | Speed B: ");
+    Serial.println(i);
+  }
+
+  // 減速
+  for(int i = 255; i >= 0; i--){
+    ledcWrite(LEDC_CHANNEL_A, i);
+    ledcWrite(LEDC_CHANNEL_B, i);
+    delay(10);
+    Serial.print("Speed A: ");
+    Serial.print(i);
+    Serial.print(" | Speed B: ");
+    Serial.println(i);
+  }
+
+  // 停止
+  Serial.println("Stop");
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, HIGH); // AIN1とAIN2を同時にHIGHにしてブレーキ状態にする
+  delay(500);
+
+  // 逆回転
+  Serial.println("Reverse");
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, HIGH);
+
+  // 加速
+  for(int i = 0; i <= 255; i++){
+    ledcWrite(LEDC_CHANNEL_A, i);
+    ledcWrite(LEDC_CHANNEL_B, i);
+    delay(10);
+    Serial.print("Speed A: ");
+    Serial.print(i);
+    Serial.print(" | Speed B: ");
+    Serial.println(i);
+  }
+
+  // 減速
+  for(int i = 255; i >= 0; i--){
+    ledcWrite(LEDC_CHANNEL_A, i);
+    ledcWrite(LEDC_CHANNEL_B, i);
+    delay(10);
+    Serial.print("Speed A: ");
+    Serial.print(i);
+    Serial.print(" | Speed B: ");
+    Serial.println(i);
+  }
+
+  // 停止
+  Serial.println("Stop");
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, HIGH);
+  delay(500);
+}
