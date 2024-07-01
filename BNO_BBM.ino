@@ -22,7 +22,7 @@ void setup(void)
     while (1);
   }
 
-  delay(1000);
+  delay(10000);
 
   /* Display the current temperature */
   int8_t temp = bno.getTemp();
@@ -59,12 +59,12 @@ void get_bno055_data(void)
   Serial.print(accel, DEC);
   Serial.print(", Mg");
   Serial.print(mag, DEC);
-  */
   
   
+  /*
   // ジャイロセンサ値の取得と表示
   imu::Vector<3> gyroscope = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  Serial.print(" 　Gy_xyz:");
+  Serial.print("   Gy_xyz:");
   Serial.print(gyroscope.x());
   Serial.print(", ");
   Serial.print(gyroscope.y());
@@ -72,7 +72,7 @@ void get_bno055_data(void)
   Serial.print(gyroscope.z());
   
   
-  /*
+  
   // 加速度センサ値の取得と表示
   imu::Vector<3> accelermetor = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
   Serial.print(" 　Ac_xyz:");
@@ -81,7 +81,7 @@ void get_bno055_data(void)
   Serial.print(accelermetor.y());
   Serial.print(", ");
   Serial.print(accelermetor.z());
-  */
+  
   
   /*
   // 磁力センサ値の取得と表示
@@ -92,34 +92,37 @@ void get_bno055_data(void)
   Serial.print(magnetmetor .y());
   Serial.print(", ");
   Serial.print(magnetmetor .z());
-  */
-
+  
+  /*
   // センサフュージョンによる方向推定値の取得と表示
   imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  Serial.print(" 　DIR_xyz:");
+  Serial.print("   DIR_xyz:");
   Serial.print(euler.x());
   Serial.print(", ");
   Serial.print(euler.y());
   Serial.print(", ");
   Serial.print(euler.z());
 
-  /*
-    // センサフュージョンの方向推定値のクオータニオン
-    imu::Quaternion quat = bno.getQuat();
-    Serial.print("qW: ");
-    Serial.print(quat.w(), 4);
-    Serial.print(" qX: ");
-    Serial.print(quat.x(), 4);
-    Serial.print(" qY: ");
-    Serial.print(quat.y(), 4);
-    Serial.print(" qZ: ");
-    Serial.print(quat.z(), 4);
-    Serial.print("\t\t");
   */
+    // センサフュージョンの方向推定値のクオータニオン
+  imu::Quaternion quat = bno.getQuat();
+  Serial.print("qW: ");
+  Serial.print(quat.w(), 4);
+  Serial.print(" qX: ");
+  Serial.print(quat.x(), 4);
+  Serial.print(" qY: ");
+  Serial.print(quat.y(), 4);
+  Serial.print(" qZ: ");
+  Serial.print(quat.z(), 4);
+  Serial.print("\t\t");
+  
 
   Serial.println();
 }
 
 void loop(void)
 {
-}
+
+
+  }
+
