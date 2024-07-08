@@ -1,0 +1,22 @@
+import serial
+import time
+
+# シリアルポートの設定 (ポートは適宜変更してください)
+ser = serial.Serial('/dev/serial0', 9600, timeout=1)  # "/dev/serial0" は適宜 "/dev/ttyS0" に変更
+
+try:
+    while True:
+        # Raspberry Pi側で受信データを処理
+        if ser.in_waiting > 0:
+            data = ser.read().decode('utf-8')
+            print(f"Received from ESP32: {data}")
+
+        # Raspberry Pi側で送信データを処理
+        user_input = input("Enter data to send to ESP32: ")
+        ser.write(user_input.encode('utf-8'))
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("Program stopped by user.")
+finally:
+    ser.close()
