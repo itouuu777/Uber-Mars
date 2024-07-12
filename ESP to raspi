@@ -1,0 +1,20 @@
+import serial
+from datetime import datetime
+ser = serial.Serial('/dev/ttyS0', 115200)
+def makecontent():
+    now = datetime.now()
+    formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
+    return formatted_date
+buffer = ""
+
+with open("log.csv", "a", encoding='utf-8') as file:
+	while True:
+		if ser.in_waiting > 0:
+			data = ser.read(ser.in_waiting).decode('utf-8', errors='ignore')
+			buffer += data
+			if '\n' in buffer:
+				lines = buffer.split('\n')
+				for line in lines[:-1]:
+					print("Complete line received: ", line)
+				file.write(makecontent() + ',' + line +'\n')
+				buffer = lines[-1]  # バッファに残った最後の部分を保持
