@@ -1,0 +1,14 @@
+import serial
+import time
+
+# シリアルポートを開く
+ser = serial.Serial('/dev/ttyS0', 115200)  # 適切なポートを指定
+time.sleep(2)  # 接続待機
+ser.write(b'left\n')  # leftを送信
+# 受信データを表示
+while True:
+    if ser.in_waiting:
+        response = ser.readline().decode('utf-8').rstrip()
+        print("Received:", response)
+
+ser.close()
