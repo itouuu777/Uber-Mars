@@ -1,0 +1,20 @@
+#include <HardwareSerial.h>
+
+void setup() {
+    Serial.begin(115200,SERIAL_8N1, 3, 1); // ボーレートを設定
+}
+
+void loop() {
+    if (Serial.available()) {
+        String command = Serial.readStringUntil('\n'); // 改行まで読み取る
+
+        // コマンドに応じた処理を実行
+        if (command == "right") {
+            Serial.println("migi");
+        } else if (command == "left") {
+            Serial.println("hidari");
+        } else {
+            Serial.println("Unknown command");
+        }
+    }
+}
