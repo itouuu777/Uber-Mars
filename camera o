@@ -1,0 +1,70 @@
+from picamera2 import Picamera2
+import cv2
+import numpy as np
+
+def cam_chosei():
+    with Picamera2() as camera:
+        try:
+            camera.resolution = (640, 480)
+            camera.start()
+            
+            while True:
+                im = camera.capture_array()
+                
+                img = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
+                hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+                lower_red = np.array([0, 211, 153])
+                upper_red = np.array([3, 255, 255])
+                
+                frame_mask_red = cv2.inRange(hsv, lower_red, upper_red)
+
+                red_contours, _ = cv2.findContours(frame_mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+                if len(red_contours) > 0:
+                    max_red_contour = max(red_contours, key=cv2.contourArea)
+
+                    # 重心の計算
+                    M = cv2.moments(max_red_contour)
+                    if M["m00"] != 0:
+                        center_mass = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+                    else:
+                        center_mass = (0, 0)
+
+                    # 画像の垂直中央線
+                    vertical_center_x = im.shape[1] // 2
+                    
+                    # 重心と垂直中央線の描画
+                    cv2.circle(img, center_mass, 5, (0, 255, 0), -1)
+                    cv2.putText(img, f"Center of Mass: {center_mass}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    
+                    chuo = 0
+                    if is_point_near_vertical_center(center_mass[0], vertical_center_x):
+                        print("Point is near vertical center line!")
+                        chuo = 1
+                        break
+                    else:
+                        backspin_L(0.1)
+                        stop()
+                        stack()
+                        chuo = 0
+               
+                if chuo == 1:
+                    break
+
+        finally:
+            cv2.destroyAllWindows()
+
+        return chuo
+
+def is_point_near_vertical_center(x, vertical_center_x, threshold=20):
+    return abs(x - vertical_center_x) < threshold
+
+# Example functions for robot control (placeholders)
+def backspin_L(duration):
+    print(f"Backspin for {duration} seconds")
+
+def stop():
+    print("Stop")
+
+def stack():
+    print("Stack")
