@@ -68,3 +68,10 @@ def stop():
 
 def stack():
     print("Stack")
+    chu=cam_chosei()
+    if chu==1:
+        print("object is centor")
+        with open("log.csv","a",encoding='utf-8')as file:
+            file.write(makecontent()+','+'sequence'+','+"object is centor!"+'\n')
+    else:
+        print("chu_error")
