@@ -460,7 +460,7 @@ void para() {
     if (Serial.available()) {
         String command = Serial.readStringUntil('\n'); // 改行まで読み取る
 
-        Serial.println("start_cam");
+        Serial.println("par_sta");
 
         // コマンドに応じた処理を実行
         if (command == "para") {
@@ -502,9 +502,6 @@ void para() {
     }
 }
 
-void offset(){
-
-}
 
 
 void camera_yudou(){
@@ -536,17 +533,18 @@ void goal() {
       if (Serial.available()) {
         String command = Serial.readStringUntil('\n'); // 改行まで読み取る
 
-        Serial.println("start_cam");
+        Serial.println("start_goal");
 
         // コマンドに応じた処理を実行
-        if (command == "yet") {
-          mae(150,150);
 
-        }
-        else if (command == "arrival") {
+        if (command == "arrival") {
             Serial.println("goal");
             Serial.println("end_cam");
             break;
+        }
+        else {
+          mae(150,150);
+
         }
     }
   }
@@ -564,7 +562,6 @@ void loop() {
   mae(200,200);
   delay(3000);
   stop();
-  offset();
   adjust();
   para();
   pid();
