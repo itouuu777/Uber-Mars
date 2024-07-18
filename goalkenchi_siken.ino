@@ -192,7 +192,7 @@ void para() {
             digitalWrite(BIN1, HIGH);
             digitalWrite(BIN2, LOW);
 
-            for(int i = 230; i <= 180; i--){
+            for(int i = 230; i >=180; i--){
               ledcWrite(LEDC_CHANNEL_A, 230);
               ledcWrite(LEDC_CHANNEL_B, i);
               delay(10);
