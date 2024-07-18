@@ -322,7 +322,7 @@ void para() {
     }
 }
 
-void(){
+void　loop(){
   para();
   land();
   yodan();
