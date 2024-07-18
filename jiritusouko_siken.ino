@@ -37,7 +37,7 @@ const int LEDC_CHANNEL_A = 0;
 const int LEDC_CHANNEL_B = 1;
 const int LEDC_BASE_FREQ = 1000;
 double relativeDirection;
-//pid
+//pid制御パラメータ
 #define gpsSp 200
 #define gpsTp 0.75
 
@@ -192,7 +192,7 @@ void para() {
             digitalWrite(BIN1, HIGH);
             digitalWrite(BIN2, LOW);
 
-            for(int i = 230; i <= 180; i--){
+            for(int i = 230; i >= 180; i--){
               ledcWrite(LEDC_CHANNEL_A, 230);
               ledcWrite(LEDC_CHANNEL_B, i);
               delay(10);
@@ -201,7 +201,7 @@ void para() {
               Serial.print(" | Speed B: ");
               Serial.println(i);
             } 
-            for(int i = 180; i <= 230; i--){
+            for(int i = 180; i <= 230; i++){
               ledcWrite(LEDC_CHANNEL_A, 230);
               ledcWrite(LEDC_CHANNEL_B, i);
               delay(10);
