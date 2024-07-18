@@ -126,6 +126,28 @@ void stop(){
 
 }
 
+// 回転_右
+void spin_r(int i, int j){
+  Serial.println("spin_r");
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, LOW);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, HIGH);
+  ledcWrite(LEDC_CHANNEL_A, i);
+  ledcWrite(LEDC_CHANNEL_B, j);
+}
+
+// 回転_左
+void spin_l(int i, int j){
+  Serial.println("spin_l");
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, LOW);
+  ledcWrite(LEDC_CHANNEL_A, i);
+  ledcWrite(LEDC_CHANNEL_B, j);
+}
+
 // オイラ角取得
 void get_oira() {
   imu::Quaternion quat = bno.getQuat();
