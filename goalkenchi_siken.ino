@@ -297,7 +297,7 @@ void adjust() {
   while (true) {
     get_turn();
 
-    double ave_turn = relativeDirection;
+    double relativeDirection = get_turn();
     double ave_dit = gps_data[1];
     
     // 目標方向に十分に向いている場合、ループを抜ける
@@ -322,6 +322,7 @@ void adjust() {
 void pid() {
   while (true) {
     get_turn();
+    double relativeDirection = get_turn();
 
     double ave_turn = relativeDirection;
     double ave_dit = gps_data[1];
