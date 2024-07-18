@@ -1,0 +1,40 @@
+#include <Wire.h>
+#include <Adafruit_BNO055.h>
+#include <Adafruit_BME280.h>
+#include <Ticker.h>
+#include <cmath>
+#include <TinyGPS++.h>
+#include <math.h>
+#include <HardwareSerial.h>
+void setup() {
+  Serial.begin(115200); 
+  pinMode(32, OUTPUT);
+}
+void yodan(){
+  digitalWrite(32, HIGH);
+  delay(1000);
+  digitalWrite(32,LOW);
+  delay(1000);
+  Serial.println("yodan");
+}
+void loop(){
+  delay(5000);
+  yodan();
+  while (true) {
+    
+
+    double ave_turn = 100;
+    double ave_dit = 100;
+    
+    // 目標方向に十分に向いている場合、ループを抜ける
+    if (ave_dit > -10 && ave_dit < 10) {
+      break;
+    } else {
+      // 右回りか左回りかを決定
+      delay(50000);
+      Serial.println("kuso");
+
+    }
+  }
+
+}
