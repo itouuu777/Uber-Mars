@@ -289,7 +289,7 @@ void para() {
             digitalWrite(BIN1, HIGH);
             digitalWrite(BIN2, LOW);
 
-            for(int i = 230; i <= 180; i--){
+            for(int i = 230; i >= 180; i --){
               ledcWrite(LEDC_CHANNEL_A, 230);
               ledcWrite(LEDC_CHANNEL_B, i);
               delay(10);
@@ -298,7 +298,7 @@ void para() {
               Serial.print(" | Speed B: ");
               Serial.println(i);
             } 
-            for(int i = 180; i <= 230; i--){
+            for(int i = 180; i <= 230; i ++){
               ledcWrite(LEDC_CHANNEL_A, 230);
               ledcWrite(LEDC_CHANNEL_B, i);
               delay(10);
@@ -322,7 +322,7 @@ void para() {
     }
 }
 
-void　loop(){
+void loop() {
   para();
   land();
   yodan();
