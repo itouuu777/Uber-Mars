@@ -9,7 +9,7 @@
 #define RXD2 16
 #define TXD2 17
 #define PI 3.14159265
-#define EARTH_RAD 6378.137 // km
+#define EARTH_RAD 6378137 // m
 
 
 Adafruit_BNO055 bno=Adafruit_BNO055(55, 0x28);;
@@ -45,6 +45,7 @@ double relativeDirection;
 //pid_gps
 #define gpsSp 255
 #define gpsTp 1
+#define gpsSps 235
 
 float last_turn_error = 0.0;
 float last_d_term = 0.0;
@@ -63,7 +64,7 @@ float last_d_terms = 0.0;
 float alphas = 0.1;
 float kps = 0.5;
 float kds = 0;
-float kis = 0.3;
+float kis = 0;
 float last_turns = 0;
 float i_turns = 0;
 float integral_turns = 0.0;
@@ -79,7 +80,7 @@ void setup() {
 
   pinMode(21, INPUT_PULLUP); //SDA 21番ピンのプルアップ
   pinMode(22, INPUT_PULLUP); //SDA 22番ピンのプルアップ
-
+  pinMode(32, OUTPUT); //溶断
   Serial.println("Orientation Sensor Raw Data Test");
 
   if (!bno.begin()) {
@@ -361,22 +362,24 @@ void land() {
     get_pres();
     pres1 = pres_data[1] - pres_data[0];
     pres2 = pres_data[2] - pres_data[1];
-    if (pres1 < 1 && pres2 < 1) {
-      Serial.println("ookk");
+    if (pres1 < 0.03 && pres2 < 0.03) {
+      Serial.println("pres_ok");
       while (1) {
         get_acc();
         double acc1 = acc_data[1] - acc_data[0];
         double acc2 = acc_data[2] - acc_data[1];
-        if (acc1 > 1 && acc2 > 1) {
+        if (abs(acc1) > 0.5 && abs(acc2) > 0.5) {
           delay(1000);
-        } else {
+        } 
+        else {
+          Serial.println("acc_ok");
           break;
         }
       }
       break;
     }
   }
-  Serial.println("Touch down");
+  Serial.println("cyakuchi");
 }
 
 //溶断
@@ -423,15 +426,15 @@ void para() {
           Serial.println("kaihi");
           Serial.println("end_cam");
           adjust();
+          break;
         }
 
          
         else if (command == "non") {
             Serial.println("non para");
+            break;
         } 
-        else {
-            Serial.println("Unknown command");
-        }
+
     }
 }
 
@@ -470,15 +473,16 @@ void gp_data() {
         if (gps.location.isUpdated()) {
             gps_lat = gps.location.lat();
             gps_lon = gps.location.lng();
-            
+            /*
             Serial.print("LAT:  ");
             Serial.println(gps_lat, 9);
             Serial.print("LON:  ");
             Serial.println(gps_lon, 9);
+            */
             
            // ゴール地点の緯度,経度
-            double goal_lat =   // ゴールの緯度
-            double goal_lon =  // ゴールの経度
+            double goal_lat = 35.924685250;// ゴールの緯度
+            double goal_lon = 139.911880667; // ゴールの経度
 
             // 現在地からゴール地点への方位角の計算
             double azimuth = Azimuth(gps_lat, gps_lon, goal_lat, goal_lon);
@@ -489,7 +493,7 @@ void gp_data() {
             Serial.println(azimuth);
             Serial.print("距離: ");
             Serial.print(distance);
-            Serial.println(" km");
+            Serial.println(" m");
             
             gps_data[0] = azimuth;   
             gps_data[1] = distance;
@@ -505,9 +509,11 @@ double get_turn() {
   double currentmag = mag_data[0]; 
   double goalDirection = gps_data[0];
   double relativeDirection = goalDirection - currentmag;
-  
+  Serial.print("currentmag:");
   Serial.println(currentmag);
+  Serial.print("goalDirection:");
   Serial.println(goalDirection);
+  Serial.print("relativeDirection:");
   Serial.println(relativeDirection);
   if (relativeDirection < -180) {
     relativeDirection += 360;
@@ -536,12 +542,12 @@ void adjust() {
       break;
     } 
     else if(ave_turn < 0){
-        spin_r(230, 230);
-        delay(500);        
+        spin_r(200, 200);
+        delay(300);        
       }
     else if(ave_turn > 0){
-        spin_l(230, 230);
-        delay(500);         
+        spin_l(200, 200);
+        delay(300);         
       }
     }
     
@@ -555,7 +561,7 @@ void pid() {
     double ave_turn = leg_data[0];
     double ave_dit = gps_data[1];
 
-    if (ave_dit < 0.005) {
+    if (ave_dit < 5) {
         stop();
         Serial.println("ok_pid");
         break;
@@ -661,12 +667,6 @@ double get_turn2() {
   return relativeDirection;
 }
 
-//お試し
-void Serial_clear() {
-  while (Serial.available() > 0) {
-    Serial.read();  // シリアルバッファからデータを読み取ることでクリア
-  }
-}
 
 //画像でのゴール誘導（占有率）
 void goal() {
@@ -674,8 +674,8 @@ void goal() {
     oira_data[2] = yaws;
     Serial.print("yaw:");
     Serial.println(oira_data[2]);
-    delay(5000);
     Serial.println("start_goal"); //rasへのコマンド指令
+    delay(5000);
     while(true){
       if (Serial.available()>0) {
         String command = Serial.readStringUntil('\n'); // 改行まで読み取る
@@ -690,7 +690,6 @@ void goal() {
           break;
         }
         else if(command == "zensin"){
-          Serial.println("onchiuu");
           float turn_errors = ave_turns;
 
           float p_terms = kps * turn_errors;
@@ -706,20 +705,20 @@ void goal() {
           float last_turn_errors = turn_errors;
 
           if (pid_outputs > 0) {
-              PID_lefts = gpsSp;
-              PID_rights = gpsSp - pid_outputs;
+              PID_lefts = gpsSps;
+              PID_rights = gpsSps - pid_outputs;
           } 
           else if (pid_outputs < 0) {
-              PID_rights = gpsSp;
-              PID_lefts = gpsSp + pid_outputs;
+              PID_rights = gpsSps;
+              PID_lefts = gpsSps + pid_outputs;
           }
           else if (pid_outputs = 0) {
-              PID_rights = 255;
-              PID_lefts = 255;
+              PID_rights = 235;
+              PID_lefts = 235;
           }        
           
-          PID_lefts = constrain(PID_lefts, 230, 255);
-          PID_rights = constrain(PID_rights, 230, 255);
+          PID_lefts = constrain(PID_lefts, 200, 235);
+          PID_rights = constrain(PID_rights, 200, 235);
           Serial.print("\tp_term :");
           Serial.print(p_terms);
           Serial.print("\tpid_output :");
@@ -729,10 +728,10 @@ void goal() {
           Serial.print(",");
           Serial.println(PID_rights);
           
-          mae(PID_rights, PID_lefts);
+          mae(PID_lefts, PID_rights);
           delay(500);
-          Serial_clear();
-g        
+
+       
         }
 
 
@@ -758,11 +757,11 @@ void first() {
 void loop(){
   first();//ラズパイ側で何か入力
   level();//収納判定
-  upper();//浮上判定（カス）
+  upper();//浮上判定
   left();//放出判定
-  land();//着地判定（カス）
+  land();//着地判定
   yodan();//溶断
-  mae(200,200);//キャリア脱出
+  mae(250,250);//キャリア脱出
   delay(3000);
   stop();
   adjust();//角度調整
@@ -773,5 +772,5 @@ void loop(){
   camera_yudou();//画像角度調整
   Serial.println("next_goal");
   goal();//画像誘導ゴール判定
-  Serial.println("ok!!");
+  Serial.println("finish!!");
 }
