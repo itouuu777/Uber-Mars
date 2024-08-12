@@ -813,10 +813,6 @@ void first() {
 }
 
 void loop(){
-  level();//収納判定
-  upper();//浮上判定
-  left();//放出判定
-  land();//着地判定
   first();//ラズパイ側で何か入力
   level();//収納判定
   upper();//浮上判定
